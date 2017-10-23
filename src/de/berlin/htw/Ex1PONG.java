@@ -6,6 +6,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.TrueTypeFont;
+
+import java.awt.*;
 
 public class Ex1PONG {
   private static int width = 1000;
@@ -22,6 +25,7 @@ public class Ex1PONG {
   private int ballX, ballY;
   private int ballSize = 10;
   private int player1Score, player2Score;
+  private TrueTypeFont font;
 
   public Ex1PONG() {
   }
@@ -34,6 +38,11 @@ public class Ex1PONG {
   public void resetBall() {
     ballX = width / 2;
     ballY = height / 2;
+  }
+
+  public void resetScore() {
+    player1Score = 0;
+    player2Score = 0;
   }
 
   public void run() {
@@ -57,10 +66,19 @@ public class Ex1PONG {
     GL11.glMatrixMode(GL11.GL_PROJECTION);
     GL11.glLoadIdentity();
     GL11.glOrtho(0, width, 0, height, 1, -1);
+    //GL11.glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 1, -1);
     GL11.glMatrixMode(GL11.GL_MODELVIEW);
 
     lastFPS = getTime();
+
+    Font awtFont = new Font("Arial", Font.BOLD, 24);
+    font = new TrueTypeFont(awtFont, true);
+
+    GL11.glEnable(GL11.GL_TEXTURE_2D);
+    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
     resetBall();
+    resetScore();
   }
 
   public boolean update() {
@@ -94,11 +112,14 @@ public class Ex1PONG {
 
   public void draw() {
     // clear screen
+    GL11.glColor3f(1.0f, 1.0f, 1.0f);
     GL11.glClearColor(0.1f, 0.1f, 0.1f, 1);
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-    // set color to white
-    GL11.glColor3f(1.0f, 1.0f, 1.0f);
+    GL11.glEnable(GL11.GL_BLEND);
+    font.drawString(15, height - 30, String.valueOf(player1Score), org.newdawn.slick.Color.white);
+    font.drawString(width - 30, height - 30, String.valueOf(player2Score), org.newdawn.slick.Color.white);
+    GL11.glDisable(GL11.GL_BLEND);
 
     // Player 1
     drawRect(0, player1Pos, paddleThickness, paddleHeight);
