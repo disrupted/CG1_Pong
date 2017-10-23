@@ -8,20 +8,20 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 public class Ex1PONG {
-  private static int width = 800;
-  private static int height = 640;
-  private long fps, lastFPS;
-  private long lastTime;
+  private static int width = 1000;
+  private static int height = 600;
   private static int paddleHeight = 100;
   private static int paddleThickness = 10;
-  private int player1Pos = height / 2;
-  private int player2Pos = height / 2;
-  private int ballX = width / 2;
-  private int ballY = height / 2;
-  private int ballSize = 20;
   int playerSpeed = 1;
-  int ballXspeed = 5;
-  int ballYspeed = 5;
+  int ballXspeed = 4;
+  int ballYspeed = 4;
+  private long fps, lastFPS;
+  private long lastTime;
+  private int player1Pos = 0;
+  private int player2Pos = height / 2;
+  private int ballX, ballY;
+  private int ballSize = 10;
+  private int player1Score, player2Score;
 
   public Ex1PONG() {
   }
@@ -29,6 +29,11 @@ public class Ex1PONG {
   public static void main(String[] args) {
     Ex1PONG game = new Ex1PONG();
     game.run();
+  }
+
+  public void resetBall() {
+    ballX = width / 2;
+    ballY = height / 2;
   }
 
   public void run() {
@@ -55,15 +60,16 @@ public class Ex1PONG {
     GL11.glMatrixMode(GL11.GL_MODELVIEW);
 
     lastFPS = getTime();
+    resetBall();
   }
 
   public boolean update() {
     boolean end = Display.isCloseRequested();
     Display.sync(60);
     Display.update();
-    /* long time = getTime();
+    long time = getTime();
     float timeDiff = time - lastTime; // delta between frames
-    lastTime = time; */
+    lastTime = time;
     updateFPS();
     if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) end = true;
     // if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) isRunning = true;
@@ -102,12 +108,29 @@ public class Ex1PONG {
 
     // Ball
     drawRect(ballX, ballY, ballSize, ballSize);
-    if (ballX + ballSize >= width || ballX <= 0) {
-      ballXspeed = -ballXspeed;
-    }
     if (ballY + ballSize >= height || ballY <= 0) {
       ballYspeed = -ballYspeed;
     }
+
+    if (ballX < paddleThickness) {
+      // left side
+      if (ballY + ballSize >= player1Pos && ballY <= player1Pos + paddleHeight) {
+        ballXspeed = -ballXspeed;
+      } else {
+        resetBall();
+        player2Score++;
+      }
+    }
+    if (ballX + ballSize > width - paddleThickness) {
+      // right side
+      if (ballY + ballSize >= player2Pos && ballY <= player2Pos + paddleHeight) {
+        ballXspeed = -ballXspeed;
+      } else {
+        resetBall();
+        player1Score++;
+      }
+    }
+
 
     ballX += ballXspeed;
     ballY += ballYspeed;
