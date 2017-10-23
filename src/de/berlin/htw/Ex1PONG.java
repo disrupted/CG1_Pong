@@ -2,6 +2,7 @@ package de.berlin.htw;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
@@ -9,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 public class Ex1PONG {
   private static int width = 800;
   private static int height = 640;
-  private int fps, lastFPS;
+  private long fps, lastFPS;
   private long lastTime;
   private static int paddleHeight = 100;
   private static int paddleThickness = 10;
@@ -18,8 +19,9 @@ public class Ex1PONG {
   private int ballX = width / 2;
   private int ballY = height / 2;
   private int ballSize = 20;
-  int speed = 10;
-  int ballspeed = 1;
+  int playerSpeed = 1;
+  int ballXspeed = 5;
+  int ballYspeed = 5;
 
   public Ex1PONG() {
   }
@@ -51,19 +53,36 @@ public class Ex1PONG {
     GL11.glLoadIdentity();
     GL11.glOrtho(0, width, 0, height, 1, -1);
     GL11.glMatrixMode(GL11.GL_MODELVIEW);
+
+    lastFPS = getTime();
   }
 
   public boolean update() {
     boolean end = Display.isCloseRequested();
+    Display.sync(60);
     Display.update();
-    long time = getTime();
+    /* long time = getTime();
     float timeDiff = time - lastTime; // delta between frames
-    lastTime = time;
+    lastTime = time; */
     updateFPS();
-    /* if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) end = true;
-    if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) isRunning = true;
-    if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) xPlayerPos -= xPlayerSpeed * timeDiff;
-    if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) xPlayerPos += xPlayerSpeed * timeDiff; */
+    if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) end = true;
+    // if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) isRunning = true;
+    if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+      if (player2Pos + paddleHeight < height)
+        player2Pos += playerSpeed * timeDiff;
+    }
+    if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+      if (player1Pos + paddleHeight < height)
+        player1Pos += playerSpeed * timeDiff;
+    }
+    if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+      if (player2Pos > 0)
+        player2Pos -= playerSpeed * timeDiff;
+    }
+    if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+      if (player1Pos > 0)
+        player1Pos -= playerSpeed * timeDiff;
+    }
     return !end;
   }
 
@@ -72,7 +91,7 @@ public class Ex1PONG {
     GL11.glClearColor(0.1f, 0.1f, 0.1f, 1);
     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-    // RGBA set color to blue
+    // set color to white
     GL11.glColor3f(1.0f, 1.0f, 1.0f);
 
     // Player 1
@@ -83,8 +102,15 @@ public class Ex1PONG {
 
     // Ball
     drawRect(ballX, ballY, ballSize, ballSize);
-    ballX += ballspeed;
-    ballY += ballspeed;
+    if (ballX + ballSize >= width || ballX <= 0) {
+      ballXspeed = -ballXspeed;
+    }
+    if (ballY + ballSize >= height || ballY <= 0) {
+      ballYspeed = -ballYspeed;
+    }
+
+    ballX += ballXspeed;
+    ballY += ballYspeed;
   }
 
   public void finish() {
