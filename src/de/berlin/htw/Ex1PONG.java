@@ -76,13 +76,13 @@ public class Ex1PONG {
     GL11.glColor3f(1.0f, 1.0f, 1.0f);
 
     // Player 1
-    drawRect(0, player1Pos, paddleThickness, player1Pos + paddleHeight);
+    drawRect(0, player1Pos, paddleThickness, paddleHeight);
 
     // Player 2
-    drawRect(width, player2Pos, width - paddleThickness, player2Pos + paddleHeight);
+    drawRect(width - paddleThickness, player2Pos, paddleThickness, paddleHeight);
 
     // Ball
-    drawRect(ballX, ballY, ballX + ballSize, ballY + ballSize);
+    drawRect(ballX, ballY, ballSize, ballSize);
     ballX += ballspeed;
     ballY += ballspeed;
   }
@@ -92,12 +92,12 @@ public class Ex1PONG {
     System.out.println("GAME OVER");
   }
 
-  private void drawRect(int xs, int ys, int xe, int ye) {
+  private void drawRect(int x, int y, int width, int height) {
     GL11.glBegin(GL11.GL_QUADS);
-    GL11.glVertex2f(xs, ys);
-    GL11.glVertex2f(xs, ye);
-    GL11.glVertex2f(xe, ye);
-    GL11.glVertex2f(xe, ys);
+    GL11.glVertex2f(x, y);
+    GL11.glVertex2f(x + width, y);
+    GL11.glVertex2f(x + width, y + height);
+    GL11.glVertex2f(x, y + height);
     GL11.glEnd();
   }
 
